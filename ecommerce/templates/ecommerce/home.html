@@ -1,0 +1,163 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Your Premium <span>Marketplace</span><br>Starts Here</h1>
+    <p>Discover thousands of products from trusted vendors. Fast delivery, secure payments, and an unbeatable shopping experience.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="/products/" class="btn btn-primary btn-lg">Shop Now →</a>
+      {% if not request.user.is_authenticated or not request.user.userprofile.is_vendor %}
+      <a href="/register/vendor/" class="btn btn-outline-white btn-lg">Sell With Us</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section">
+  <div class="container">
+    <div class="section-header-line">
+      <div class="section-header" style="margin-bottom:0;">
+        <h2>Shop by Category</h2>
+        <p>Find exactly what you're looking for</p>
+      </div>
+    </div>
+    <div class="categories-grid">
+      {% for cat in categories %}
+      <a href="/category/{{ cat.slug }}/" class="category-card">
+        <div class="category-card-icon">
+          {% if cat.image %}<img src="{{ cat.image.url }}" alt="{{ cat.name }}" style="width:40px;height:40px;object-fit:cover;border-radius:50%;margin:0 auto 0.5rem;">
+          {% else %}🛍️{% endif %}
+        </div>
+        <div class="category-card-name">{{ cat.name }}</div>
+      </a>
+      {% empty %}
+      <p style="color:var(--gray-400);grid-column:1/-1;">No categories yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section" style="background:var(--gray-100);padding-top:3rem;padding-bottom:3rem;">
+  <div class="container">
+    <div class="section-header-line">
+      <div class="section-header" style="margin-bottom:0;">
+        <h2>Featured Products</h2>
+        <p>Handpicked just for you</p>
+      </div>
+      <a href="/products/" class="btn btn-outline btn-sm">View All →</a>
+    </div>
+    <div class="products-grid">
+      {% for product in featured_products %}
+      <a href="/products/{{ product.slug }}/" class="product-card" style="color:inherit;">
+        <div class="product-card-image">
+          {% if product.thumbnail %}
+            <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}">
+          {% else %}
+            <div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem;">🛍️</div>
+          {% endif %}
+          {% if product.discount_pct > 0 %}
+            <span class="product-badge">-{{ product.discount_pct|floatformat:0 }}%</span>
+          {% endif %}
+        </div>
+        <div class="product-card-body">
+          <div class="product-card-cat">{{ product.category.name }}</div>
+          <div class="product-card-name">{{ product.name }}</div>
+          <div class="product-card-rating">
+            <span class="stars">
+              {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}★{% else %}☆{% endif %}{% endfor %}
+            </span>
+            <span class="rating-count">({{ product.reviews.count }})</span>
+          </div>
+          <div class="product-card-price">
+            <span class="price-current">PKR {{ product.discounted_price }}</span>
+            {% if product.discount_pct > 0 %}
+              <span class="price-original">PKR {{ product.price }}</span>
+            {% endif %}
+          </div>
+          <button class="btn btn-dark btn-sm btn-full">Add to Cart</button>
+        </div>
+      </a>
+      {% empty %}
+      <p style="color:var(--gray-400);grid-column:1/-1;text-align:center;padding:2rem;">No products yet. <a href="/register/vendor/">Become a vendor</a> to add products!</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- TOP RATED -->
+{% if top_rated %}
+<section class="section">
+  <div class="container">
+    <div class="section-header-line">
+      <div class="section-header" style="margin-bottom:0;">
+        <h2>⭐ Top Rated</h2>
+        <p>Most loved by customers</p>
+      </div>
+    </div>
+    <div class="products-grid">
+      {% for product in top_rated %}
+      <a href="/products/{{ product.slug }}/" class="product-card" style="color:inherit;">
+        <div class="product-card-image">
+          {% if product.thumbnail %}
+            <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}">
+          {% else %}
+            <div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem;">⭐</div>
+          {% endif %}
+        </div>
+        <div class="product-card-body">
+          <div class="product-card-cat">{{ product.category.name }}</div>
+          <div class="product-card-name">{{ product.name }}</div>
+          <div class="product-card-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-count">{{ product.average_rating }}/5</span>
+          </div>
+          <div class="product-card-price">
+            <span class="price-current">PKR {{ product.discounted_price }}</span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- VALUE PROPS -->
+<section class="section" style="background:var(--navy);color:var(--white);">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;text-align:center;">
+     <div><div style="font-size:2rem;">🚚</div><h3>Fast Delivery</h3><p>Free shipping on orders above PKR 2000</p></div>
+<div><div style="font-size:2rem;">🔒</div><h3>Secure Payments</h3><p>PCI DSS compliant checkout</p></div>
+<div><div style="font-size:2rem;">↩️</div><h3>Easy Returns</h3><p>7-day hassle-free returns</p></div>
+<div><div style="font-size:2rem;">🎯</div><h3>Top Quality</h3><p>Verified vendors only</p></div>
+      <div>
+        <div style="font-size:2.2rem;margin-bottom:0.75rem;">🚚</div>
+        <h4 style="font-family:var(--font-display);color:var(--gold);margin-bottom:0.4rem;">Fast Delivery</h4>
+        <p style="font-size:0.875rem;color:var(--gray-400);">Free shipping on orders above PKR 2,000</p>
+      </div>
+      <div>
+        <div style="font-size:2.2rem;margin-bottom:0.75rem;">🔒</div>
+        <h4 style="font-family:var(--font-display);color:var(--gold);margin-bottom:0.4rem;">Secure Payments</h4>
+        <p style="font-size:0.875rem;color:var(--gray-400);">PCI DSS compliant checkout process</p>
+      </div>
+      <div>
+        <div style="font-size:2.2rem;margin-bottom:0.75rem;">↩️</div>
+        <h4 style="font-family:var(--font-display);color:var(--gold);margin-bottom:0.4rem;">Easy Returns</h4>
+        <p style="font-size:0.875rem;color:var(--gray-400);">7-day hassle-free return policy</p>
+      </div>
+      <div>
+        <div style="font-size:2.2rem;margin-bottom:0.75rem;">🎯</div>
+        <h4 style="font-family:var(--font-display);color:var(--gold);margin-bottom:0.4rem;">Top Quality</h4>
+        <p style="font-size:0.875rem;color:var(--gray-400);">Verified vendors only on ShopVerse</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

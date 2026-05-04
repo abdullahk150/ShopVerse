@@ -1,0 +1,88 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Vendor Dashboard{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+      <div>
+        <h1 style="font-family:var(--font-display);font-size:2rem;">🏪 {{ vendor.store_name }}</h1>
+        <span class="status-badge status-{{ vendor.status }}">{{ vendor.status|capfirst }}</span>
+      </div>
+      <a href="/vendor/products/add/" class="btn btn-primary">+ Add Product</a>
+    </div>
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:2.5rem;">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info"><p>Products</p><h3>{{ products.count }}</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-info"><p>Recent Orders</p><h3>{{ recent_orders.count }}</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info"><p>Total Revenue</p><h3>PKR {{ total_revenue|floatformat:0 }}</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-info"><p>Store Status</p><h3 style="font-size:1rem;color:var(--green);">Active</h3></div>
+      </div>
+    </div>
+
+    <!-- Products Table -->
+    <h2 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:1.25rem;">My Products</h2>
+    <table class="data-table" style="margin-bottom:2rem;">
+      <thead>
+        <tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td style="font-weight:600;">{{ p.name }}</td>
+          <td>{{ p.category.name|default:"—" }}</td>
+          <td>PKR {{ p.discounted_price }}</td>
+          <td>
+            <span style="color:{% if p.stock == 0 %}var(--red){% elif p.stock < 5 %}var(--orange){% else %}var(--green){% endif %};font-weight:600;">
+              {{ p.stock }}
+            </span>
+          </td>
+          <td><span class="status-badge {% if p.status == 'active' %}status-delivered{% else %}status-cancelled{% endif %}">{{ p.status }}</span></td>
+          <td style="display:flex;gap:0.5rem;">
+            <a href="/vendor/products/{{ p.id }}/edit/" class="btn btn-sm btn-outline">Edit</a>
+            <form method="POST" action="/vendor/products/{{ p.id }}/delete/" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this product?')">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:2rem;">No products yet. <a href="/vendor/products/add/" style="color:var(--gold);">Add your first product →</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Recent Orders -->
+    <h2 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:1.25rem;">Recent Order Items</h2>
+    <table class="data-table">
+      <thead>
+        <tr><th>Order #</th><th>Product</th><th>Qty</th><th>Revenue</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {% for item in recent_orders %}
+        <tr>
+          <td style="color:var(--gold);font-weight:700;">{{ item.order.order_number }}</td>
+          <td>{{ item.product_name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>PKR {{ item.line_total }}</td>
+          <td>{{ item.order.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:2rem;">No orders yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

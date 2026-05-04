@@ -1,0 +1,82 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}{{ action }} Product{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/vendor/">Vendor Dashboard</a><span class="breadcrumb-sep">›</span>
+      <span>{{ action }} Product</span>
+    </div>
+    <div class="form-card" style="max-width:680px;">
+      <h2 class="form-title">{{ action }} Product</h2>
+      <p class="form-subtitle">Fill in the product details below</p>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input type="text" name="name" class="form-control" required value="{{ form.name.value|default:'' }}">
+          {% if form.name.errors %}<small style="color:var(--red);">{{ form.name.errors.0 }}</small>{% endif %}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select name="category" class="form-control" required>
+              {% for cat in form.fields.category.queryset %}
+                <option value="{{ cat.id }}" {% if form.category.value == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">SKU</label>
+            <input type="text" name="sku" class="form-control" value="{{ form.sku.value|default:'' }}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description *</label>
+          <textarea name="description" class="form-control" rows="5" required>{{ form.description.value|default:'' }}</textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Price (PKR) *</label>
+            <input type="number" name="price" class="form-control" step="0.01" min="0.01" required value="{{ form.price.value|default:'' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Discount %</label>
+            <input type="number" name="discount_pct" class="form-control" step="0.01" min="0" max="100" value="{{ form.discount_pct.value|default:'0' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stock Quantity *</label>
+            <input type="number" name="stock" class="form-control" min="0" required value="{{ form.stock.value|default:'0' }}">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" name="weight_kg" class="form-control" step="0.01" min="0" value="{{ form.weight_kg.value|default:'0' }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-control">
+              <option value="active"   {% if form.status.value == 'active'   %}selected{% endif %}>Active</option>
+              <option value="inactive" {% if form.status.value == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Thumbnail Image</label>
+          {% if product and product.thumbnail %}
+            <div style="margin-bottom:0.5rem;">
+              <img src="{{ product.thumbnail.url }}" style="height:80px;border-radius:var(--radius);">
+            </div>
+          {% endif %}
+          <input type="file" name="thumbnail" class="form-control" accept="image/*">
+        </div>
+        <div style="display:flex;gap:1rem;">
+          <button type="submit" class="btn btn-primary btn-full btn-lg">{{ action }} Product</button>
+          <a href="/vendor/" class="btn btn-outline btn-full">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

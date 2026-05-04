@@ -1,0 +1,84 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}My Dashboard{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:2rem;">
+      👋 Welcome, {{ user.first_name|default:user.username }}!
+    </h1>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:2.5rem;">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info"><p>Total Orders</p><h3>{{ user.orders.count }}</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">♥</div>
+        <div class="stat-info"><p>Wishlist Items</p><h3>{{ wishlist.count }}</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-info"><p>Reviews Given</p><h3>{{ user.reviews.count }}</h3></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
+      <!-- Recent Orders -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h2 style="font-family:var(--font-display);font-size:1.2rem;">Recent Orders</h2>
+          <a href="/orders/" style="font-size:0.85rem;color:var(--gold);">View all →</a>
+        </div>
+        <div style="background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;">
+          {% for order in recent_orders %}
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--gray-100);">
+            <div>
+              <div style="font-weight:700;font-size:0.9rem;color:var(--gold);">{{ order.order_number }}</div>
+              <div style="font-size:0.78rem;color:var(--gray-400);">{{ order.created_at|date:"M d, Y" }}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;font-size:0.9rem;">PKR {{ order.total_amount }}</div>
+              <span class="status-badge status-{{ order.status }}" style="font-size:0.7rem;">{{ order.status }}</span>
+            </div>
+          </div>
+          {% empty %}
+          <div style="text-align:center;padding:2rem;color:var(--gray-400);font-size:0.875rem;">No orders yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Wishlist -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h2 style="font-family:var(--font-display);font-size:1.2rem;">My Wishlist</h2>
+        </div>
+        <div style="background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;">
+          {% for item in wishlist %}
+          <div style="display:flex;align-items:center;gap:1rem;padding:0.85rem 1.25rem;border-bottom:1px solid var(--gray-100);">
+            {% if item.product.thumbnail %}
+            <img src="{{ item.product.thumbnail.url }}" style="width:44px;height:44px;border-radius:var(--radius);object-fit:cover;">
+            {% else %}
+            <div style="width:44px;height:44px;background:var(--gray-100);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;">🛍️</div>
+            {% endif %}
+            <div style="flex:1;">
+              <a href="/products/{{ item.product.slug }}/" style="font-weight:600;font-size:0.875rem;">{{ item.product.name }}</a>
+              <div style="color:var(--gold);font-size:0.8rem;font-weight:700;">PKR {{ item.product.discounted_price }}</div>
+            </div>
+            <form method="POST" action="/wishlist/toggle/{{ item.product.id }}/">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm" style="padding:0.3rem 0.6rem;">✕</button>
+            </form>
+          </div>
+          {% empty %}
+          <div style="text-align:center;padding:2rem;color:var(--gray-400);font-size:0.875rem;">Your wishlist is empty.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem;">
+      <a href="/dashboard/profile/" class="btn btn-outline">✏️ Edit Profile</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

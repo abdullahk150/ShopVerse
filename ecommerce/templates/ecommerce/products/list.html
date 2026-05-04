@@ -1,0 +1,147 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}All Products{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a><span class="breadcrumb-sep">›</span>
+      <span>Products</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:2rem;align-items:start;">
+
+      <!-- SIDEBAR FILTERS -->
+      <aside>
+        <form method="GET" id="filterForm">
+          <div class="filter-panel">
+            <div class="filter-title">🔍 Filters</div>
+
+            <div class="filter-section">
+              <label>Search</label>
+              <input type="text" name="q" class="form-control" placeholder="Keywords…" value="{{ q }}">
+            </div>
+
+            <div class="filter-section">
+              <label>Category</label>
+              <select name="category" class="form-control" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                  <option value="{{ cat.id }}" {% if selected_cat == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="filter-section">
+              <label>Price Range (PKR)</label>
+              <div class="price-range">
+                <input type="number" name="min_price" class="form-control" placeholder="Min" value="{{ request.GET.min_price }}">
+                <span>—</span>
+                <input type="number" name="max_price" class="form-control" placeholder="Max" value="{{ request.GET.max_price }}">
+              </div>
+            </div>
+
+            <div class="filter-section">
+              <label>Sort By</label>
+              <select name="sort" class="form-control">
+                <option value="">Default</option>
+                <option value="price_asc"  {% if request.GET.sort == 'price_asc'  %}selected{% endif %}>Price: Low → High</option>
+                <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High → Low</option>
+                <option value="newest"     {% if request.GET.sort == 'newest'     %}selected{% endif %}>Newest First</option>
+                <option value="rating"     {% if request.GET.sort == 'rating'     %}selected{% endif %}>Top Rated</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">Apply Filters</button>
+            <a href="/products/" class="btn btn-outline btn-full" style="margin-top:0.5rem;">Clear</a>
+          </div>
+        </form>
+      </aside>
+
+      <!-- PRODUCT GRID -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+          <h1 style="font-family:var(--font-display);font-size:1.6rem;">
+            {% if q %}Results for "{{ q }}"{% else %}All Products{% endif %}
+          </h1>
+          <span style="color:var(--gray-600);font-size:0.875rem;">{{ products.paginator.count }} product{{ products.paginator.count|pluralize }}</span>
+        </div>
+
+        <div class="products-grid">
+          {% for product in products %}
+          <div class="product-card">
+            <a href="/products/{{ product.slug }}/">
+              <div class="product-card-image">
+                {% if product.thumbnail %}
+                  <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}" loading="lazy">
+                {% else %}
+                  <div style="height:200px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;background:var(--gray-100);">🛍️</div>
+                {% endif %}
+                {% if product.discount_pct > 0 %}
+                  <span class="product-badge">-{{ product.discount_pct|floatformat:0 }}%</span>
+                {% endif %}
+                {% if not product.in_stock %}
+                  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">Out of Stock</div>
+                {% endif %}
+              </div>
+            </a>
+            <div class="product-card-body">
+              <div class="product-card-cat">{{ product.category.name }}</div>
+              <a href="/products/{{ product.slug }}/" style="color:inherit;">
+                <div class="product-card-name">{{ product.name }}</div>
+              </a>
+              <div class="product-card-rating">
+                <span class="stars">
+                  {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}★{% else %}☆{% endif %}{% endfor %}
+                </span>
+                <span class="rating-count">({{ product.reviews.count }})</span>
+              </div>
+              <div class="product-card-price">
+                <span class="price-current">PKR {{ product.discounted_price }}</span>
+                {% if product.discount_pct > 0 %}
+                  <span class="price-original">PKR {{ product.price }}</span>
+                {% endif %}
+              </div>
+              {% if product.in_stock %}
+              <form method="POST" action="/cart/add/{{ product.id }}/">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="btn btn-dark btn-sm btn-full">🛒 Add to Cart</button>
+              </form>
+              {% else %}
+              <button class="btn btn-sm btn-full" disabled style="background:var(--gray-200);color:var(--gray-400);cursor:not-allowed;">Out of Stock</button>
+              {% endif %}
+            </div>
+          </div>
+          {% empty %}
+          <div style="grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--gray-400);">
+            <div style="font-size:3rem;margin-bottom:1rem;">🔍</div>
+            <h3 style="margin-bottom:0.5rem;">No products found</h3>
+            <p>Try adjusting your search or filters.</p>
+            <a href="/products/" class="btn btn-primary" style="margin-top:1rem;">Clear Filters</a>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- PAGINATION -->
+        {% if products.has_other_pages %}
+        <div class="pagination">
+          {% if products.has_previous %}
+            <a href="?page={{ products.previous_page_number }}&q={{ q }}" class="page-btn">‹</a>
+          {% endif %}
+          {% for num in products.paginator.page_range %}
+            {% if products.number == num %}
+              <span class="page-btn active">{{ num }}</span>
+            {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+              <a href="?page={{ num }}&q={{ q }}" class="page-btn">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+          {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}&q={{ q }}" class="page-btn">›</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

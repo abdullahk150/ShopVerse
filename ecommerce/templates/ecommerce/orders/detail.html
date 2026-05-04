@@ -1,0 +1,66 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container" style="max-width:900px;">
+    <div class="breadcrumb">
+      <a href="/">Home</a><span class="breadcrumb-sep">›</span>
+      <a href="/orders/">My Orders</a><span class="breadcrumb-sep">›</span>
+      <span>{{ order.order_number }}</span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+      <h1 style="font-family:var(--font-display);font-size:1.75rem;">Order #{{ order.order_number }}</h1>
+      <span class="status-badge status-{{ order.status }}" style="font-size:0.9rem;padding:0.4rem 1rem;">{{ order.status|capfirst }}</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+      <div style="background:var(--white);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow);">
+        <h3 style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-600);margin-bottom:1rem;">📍 Shipping Address</h3>
+        <p style="font-weight:700;">{{ order.ship_name }}</p>
+        <p style="color:var(--gray-600);font-size:0.875rem;margin-top:0.25rem;">{{ order.ship_street }}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_postal }}<br>{{ order.ship_country }}</p>
+        {% if order.ship_phone %}<p style="color:var(--gray-600);font-size:0.875rem;margin-top:0.5rem;">📞 {{ order.ship_phone }}</p>{% endif %}
+      </div>
+      <div style="background:var(--white);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow);">
+        <h3 style="font-size:0.9rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-600);margin-bottom:1rem;">💳 Payment</h3>
+        <p style="font-weight:700;">{{ order.payment.get_method_display }}</p>
+        <p style="margin-top:0.5rem;"><span class="status-badge status-{{ order.payment.status }}">{{ order.payment.status }}</span></p>
+        <p style="color:var(--gray-600);font-size:0.8rem;margin-top:0.5rem;">Placed: {{ order.created_at|date:"M d, Y H:i" }}</p>
+      </div>
+    </div>
+
+    <div style="background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.5rem;">
+      <table class="data-table">
+        <thead>
+          <tr><th style="width:50%;">Product</th><th>Unit Price</th><th>Qty</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+          <tr>
+            <td style="font-weight:600;">{{ item.product_name }}</td>
+            <td>PKR {{ item.unit_price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td style="font-weight:700;">PKR {{ item.line_total }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;">
+      <div class="cart-summary-card" style="min-width:300px;">
+        <div class="cart-summary-row"><span>Subtotal</span><span>PKR {{ order.subtotal }}</span></div>
+        <div class="cart-summary-row"><span>Shipping</span><span>PKR {{ order.shipping_cost }}</span></div>
+        <div class="cart-summary-row"><span>Tax</span><span>PKR {{ order.tax_amount }}</span></div>
+        <div class="cart-summary-row cart-summary-total"><span>Total</span><span>PKR {{ order.total_amount }}</span></div>
+      </div>
+    </div>
+
+    {% if order.notes %}
+    <div style="background:var(--gray-100);border-radius:var(--radius);padding:1rem 1.25rem;margin-top:1.5rem;font-size:0.875rem;">
+      <strong>Order Notes:</strong> {{ order.notes }}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ShopVerse{% endblock %} | ShopVerse</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ── NAVBAR ──────────────────────────────────────────── -->
+<nav class="navbar">
+  <a href="/" class="navbar-brand">Shop<span>Verse</span></a>
+
+  <form class="nav-search" action="/products/" method="GET">
+    <input type="text" name="q" placeholder="Search products…" value="{{ request.GET.q }}">
+    <button type="submit">🔍</button>
+  </form>
+
+  <div class="nav-links">
+    <a href="/products/">Shop</a>
+
+    {% if user.is_authenticated %}
+      {% if user.profile.role == 'vendor' %}
+        <a href="/vendor/">My Store</a>
+      {% elif user.profile.role == 'admin' or user.is_superuser %}
+        <a href="/admin-panel/">Admin</a>
+      {% else %}
+        <a href="/dashboard/">Dashboard</a>
+      {% endif %}
+      <a href="/orders/">My Orders</a>
+      <a href="/logout/" style="color:#ef4444;">Logout</a>
+    {% else %}
+      <a href="/login/">Login</a>
+      <a href="/register/" class="btn btn-primary btn-sm">Sign Up</a>
+    {% endif %}
+
+    <a href="/cart/" class="cart-badge">
+      🛒
+      {% if cart_item_count > 0 %}
+        <span class="badge">{{ cart_item_count }}</span>
+      {% endif %}
+    </a>
+  </div>
+</nav>
+
+<!-- ── MESSAGES ────────────────────────────────────────── -->
+{% if messages %}
+<div class="alerts" id="alerts">
+  {% for message in messages %}
+    <div class="alert {{ message.tags }}" role="alert">
+      {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────── -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ── FOOTER ──────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">ShopVerse</div>
+        <p class="footer-desc">A modern e-commerce platform built with Django & PostgreSQL. DBMS Semester Project — CYS 2024.</p>
+      </div>
+      <div>
+        <div class="footer-heading">Shop</div>
+        <ul class="footer-links">
+          <li><a href="/products/">All Products</a></li>
+          <li><a href="/products/?sort=newest">New Arrivals</a></li>
+          <li><a href="/products/?sort=rating">Top Rated</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Account</div>
+        <ul class="footer-links">
+          <li><a href="/dashboard/">My Account</a></li>
+          <li><a href="/orders/">My Orders</a></li>
+          <li><a href="/cart/">My Cart</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Sell</div>
+        <ul class="footer-links">
+          <li><a href="/register/vendor/">Become a Vendor</a></li>
+          <li><a href="/vendor/">Vendor Panel</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 ShopVerse. DBMS Semester Project.</span>
+      <span>Built with Django + PostgreSQL</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Auto-dismiss alerts
+  setTimeout(() => {
+    const alerts = document.getElementById('alerts');
+    if (alerts) {
+      alerts.style.transition = 'opacity 0.5s';
+      alerts.style.opacity = '0';
+      setTimeout(() => alerts.remove(), 500);
+    }
+  }, 4000);
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

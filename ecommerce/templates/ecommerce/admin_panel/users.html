@@ -1,0 +1,31 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/admin-panel/">Admin</a><span class="breadcrumb-sep">›</span><span>Users</span>
+    </div>
+    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:2rem;">👥 All Users</h1>
+    <table class="data-table">
+      <thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Active</th></tr></thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td style="font-weight:700;">{{ u.username }}</td>
+          <td>{{ u.get_full_name|default:"—" }}</td>
+          <td>{{ u.email }}</td>
+          <td>
+            <span class="status-badge {% if u.profile.role == 'admin' %}status-processing{% elif u.profile.role == 'vendor' %}status-confirmed{% else %}status-delivered{% endif %}">
+              {{ u.profile.role|default:"customer" }}
+            </span>
+          </td>
+          <td>{{ u.date_joined|date:"M d, Y" }}</td>
+          <td>{% if u.is_active %}✅{% else %}❌{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

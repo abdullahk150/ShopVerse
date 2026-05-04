@@ -1,0 +1,92 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}My Cart{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a><span class="breadcrumb-sep">›</span><span>My Cart</span>
+    </div>
+    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:2rem;">🛒 Shopping Cart</h1>
+
+    {% if cart.items.exists %}
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:2rem;align-items:start;">
+      <!-- CART ITEMS -->
+      <div style="background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;">
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th style="width:60%;">Product</th>
+              <th>Price</th>
+              <th>Qty</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart.items.all %}
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:1rem;">
+                  {% if item.product.thumbnail %}
+                    <img src="{{ item.product.thumbnail.url }}" class="cart-product-img" alt="{{ item.product.name }}">
+                  {% else %}
+                    <div class="cart-product-img" style="background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🛍️</div>
+                  {% endif %}
+                  <div>
+                    <div class="cart-product-name">{{ item.product.name }}</div>
+                    <div class="cart-product-vendor">{{ item.product.vendor.store_name }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>PKR {{ item.product.discounted_price }}</td>
+              <td>
+                <form method="POST" action="/cart/update/{{ item.id }}/" style="display:inline-flex;align-items:center;">
+                  {% csrf_token %}
+                  <div class="qty-control">
+                    <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="qty-btn">−</button>
+                    <span class="qty-input">{{ item.quantity }}</span>
+                    <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="qty-btn">+</button>
+                  </div>
+                </form>
+              </td>
+              <td style="font-weight:700;">PKR {{ item.line_total }}</td>
+              <td>
+                <form method="POST" action="/cart/remove/{{ item.id }}/">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this item?')">✕</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ORDER SUMMARY -->
+      <div>
+        <div class="cart-summary-card">
+          <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:1.5rem;">Order Summary</h3>
+          <div class="cart-summary-row"><span>Subtotal</span><span>PKR {{ cart.subtotal }}</span></div>
+          <div class="cart-summary-row"><span>Shipping</span><span>PKR 150.00</span></div>
+          <div class="cart-summary-row"><span>Tax</span><span>PKR 0.00</span></div>
+          <div class="cart-summary-row cart-summary-total">
+            <span>Total</span>
+            <span>PKR {{ cart.subtotal|add:'150' }}</span>
+          </div>
+          <a href="/checkout/" class="btn btn-primary btn-full btn-lg" style="margin-top:1.25rem;">Proceed to Checkout →</a>
+          <a href="/products/" class="btn btn-outline btn-full" style="margin-top:0.75rem;">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:5rem 2rem;background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);">
+      <div style="font-size:5rem;margin-bottom:1.5rem;">🛒</div>
+      <h2 style="font-family:var(--font-display);margin-bottom:0.75rem;">Your cart is empty</h2>
+      <p style="color:var(--gray-600);margin-bottom:2rem;">Looks like you haven't added anything yet.</p>
+      <a href="/products/" class="btn btn-primary btn-lg">Start Shopping →</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

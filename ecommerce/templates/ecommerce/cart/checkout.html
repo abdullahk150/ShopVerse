@@ -1,0 +1,162 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a><span class="breadcrumb-sep">›</span>
+      <a href="/cart/">Cart</a><span class="breadcrumb-sep">›</span>
+      <span>Checkout</span>
+    </div>
+    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:2rem;">Checkout</h1>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:2rem;align-items:start;">
+
+        <!-- LEFT: Shipping + Payment -->
+        <div>
+          <!-- Shipping Address -->
+          <div style="background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow);margin-bottom:1.5rem;">
+            <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:1.5rem;">📍 Shipping Address</h3>
+
+            {% if addresses %}
+            <div style="margin-bottom:1.5rem;">
+              <label class="form-label">Use a saved address</label>
+              <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                {% for addr in addresses %}
+                <label style="display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1rem;border:1.5px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;font-size:0.875rem;" onclick="fillAddress('{{ addr.full_name }}','{{ addr.street }}','{{ addr.city }}','{{ addr.state }}','{{ addr.postal_code }}','{{ addr.country }}')">
+                  <input type="radio" name="saved_addr" value="{{ addr.id }}" {% if addr.is_default %}checked{% endif %}>
+                  {{ addr.full_name }}, {{ addr.street }}, {{ addr.city }}
+                </label>
+                {% endfor %}
+              </div>
+              <div style="text-align:center;color:var(--gray-400);font-size:0.85rem;margin:0.75rem 0;">— or enter new address —</div>
+            </div>
+            {% endif %}
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Full Name *</label>
+                <input type="text" name="full_name" class="form-control" required value="{{ form.full_name.value|default:'' }}">
+              </div>
+              <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Street Address *</label>
+                <input type="text" name="street" class="form-control" required placeholder="House/Flat No., Street, Area" value="{{ form.street.value|default:'' }}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">City *</label>
+                <input type="text" name="city" class="form-control" required value="{{ form.city.value|default:'' }}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Province/State *</label>
+                <input type="text" name="state" class="form-control" required value="{{ form.state.value|default:'' }}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Postal Code</label>
+                <input type="text" name="postal_code" class="form-control" value="{{ form.postal_code.value|default:'' }}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Country</label>
+                <input type="text" name="country" class="form-control" value="{{ form.country.value|default:'Pakistan' }}">
+              </div>
+              <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Phone</label>
+                <input type="text" name="phone" class="form-control" value="{{ form.phone.value|default:'' }}">
+              </div>
+              <div class="form-group" style="grid-column:1/-1;">
+                <label class="form-label">Order Notes (optional)</label>
+                <textarea name="notes" class="form-control" rows="2" placeholder="Special instructions for delivery…"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div style="background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow);">
+            <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:1.5rem;">💳 Payment Method</h3>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+              {% for value, label in form.fields.payment_method.choices %}
+              <label style="display:flex;align-items:center;gap:0.85rem;padding:1rem;border:1.5px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--gray-200)'">
+                <input type="radio" name="payment_method" value="{{ value }}" {% if forloop.first %}checked{% endif %} onchange="toggleEasypaisa(this.value)">
+                <span style="font-size:1.1rem;">
+                  {% if value == 'cod' %}💵
+                  {% elif value == 'easypaisa' %}📱
+                  {% endif %}
+                </span>
+                <span style="font-weight:600;font-size:0.9rem;">{{ label }}</span>
+              </label>
+              {% endfor %}
+            </div>
+
+            <!-- EasyPaisa account details (shown only when EasyPaisa is selected) -->
+            <div id="easypaisa-details" style="display:none;margin-top:1.25rem;padding:1.25rem;background:var(--gray-100);border-radius:var(--radius);border:1.5px solid var(--gold);">
+              <p style="font-size:0.85rem;color:var(--gray-600);margin-bottom:1rem;">📱 <strong>Send payment to EasyPaisa account below, then fill in your details:</strong></p>
+              <div style="background:var(--white);padding:0.85rem 1rem;border-radius:var(--radius);margin-bottom:1rem;font-size:0.875rem;">
+                <strong>Account Name:</strong> ShopVerse Payments<br>
+                <strong>Account Number:</strong> 0300-0000000
+              </div>
+              <div class="form-group">
+                <label class="form-label">Your EasyPaisa Mobile Number *</label>
+                <input type="text" name="easypaisa_number" id="easypaisa_number" class="form-control" placeholder="e.g. 03XX-XXXXXXX">
+              </div>
+              <div class="form-group" style="margin-top:0.75rem;">
+                <label class="form-label">Transaction ID (optional)</label>
+                <input type="text" name="easypaisa_txn_id" id="easypaisa_txn_id" class="form-control" placeholder="EasyPaisa transaction reference">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Order Summary -->
+        <div>
+          <div class="cart-summary-card" style="position:sticky;top:85px;">
+            <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:1.5rem;">📋 Order Summary</h3>
+
+            {% for item in cart.items.all %}
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--gray-100);font-size:0.875rem;">
+              <span style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.product.name }} × {{ item.quantity }}</span>
+              <span style="font-weight:600;">PKR {{ item.line_total }}</span>
+            </div>
+            {% endfor %}
+
+            <div class="cart-summary-row" style="margin-top:0.75rem;"><span>Subtotal</span><span>PKR {{ cart.subtotal }}</span></div>
+            <div class="cart-summary-row"><span>Shipping</span><span>PKR {{ shipping_cost }}</span></div>
+            <div class="cart-summary-row"><span>Tax</span><span>PKR 0.00</span></div>
+            <div class="cart-summary-row cart-summary-total">
+              <span>Total</span>
+              <span>PKR {{ cart.subtotal|add:'150' }}</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:1.5rem;">Place Order →</button>
+            <a href="/cart/" class="btn btn-outline btn-full" style="margin-top:0.75rem;">← Back to Cart</a>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+function fillAddress(name, street, city, state, postal, country) {
+  document.querySelector('[name=full_name]').value = name;
+  document.querySelector('[name=street]').value = street;
+  document.querySelector('[name=city]').value = city;
+  document.querySelector('[name=state]').value = state;
+  document.querySelector('[name=postal_code]').value = postal;
+  document.querySelector('[name=country]').value = country;
+}
+
+function toggleEasypaisa(value) {
+  var details = document.getElementById('easypaisa-details');
+  var numInput = document.getElementById('easypaisa_number');
+  if (value === 'easypaisa') {
+    details.style.display = 'block';
+    numInput.setAttribute('required', 'required');
+  } else {
+    details.style.display = 'none';
+    numInput.removeAttribute('required');
+  }
+}
+</script>
+{% endblock %}

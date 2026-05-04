@@ -1,0 +1,63 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Create Account{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="form-card" style="max-width:560px;">
+      <h2 class="form-title">Create Account</h2>
+      <p class="form-subtitle">Join ShopVerse and start shopping today</p>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" name="first_name" class="form-control" required value="{{ form.first_name.value|default:'' }}">
+            {% if form.first_name.errors %}<small style="color:var(--red);">{{ form.first_name.errors.0 }}</small>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" class="form-control" required value="{{ form.last_name.value|default:'' }}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" required value="{{ form.username.value|default:'' }}">
+          {% if form.username.errors %}<small style="color:var(--red);">{{ form.username.errors.0 }}</small>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" required value="{{ form.email.value|default:'' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone (optional)</label>
+          <input type="text" name="phone" class="form-control" value="{{ form.phone.value|default:'' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" name="password1" class="form-control" required>
+          {% if form.password1.errors %}<small style="color:var(--red);">{{ form.password1.errors.0 }}</small>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" name="password2" class="form-control" required>
+          {% if form.password2.errors %}<small style="color:var(--red);">{{ form.password2.errors.0 }}</small>{% endif %}
+        </div>
+        {% if form.non_field_errors %}
+        <div style="background:#fee2e2;color:#991b1b;padding:0.75rem;border-radius:var(--radius);margin-bottom:1rem;font-size:0.875rem;">
+          {{ form.non_field_errors.0 }}
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-full btn-lg">Create Account →</button>
+      </form>
+
+      <p style="text-align:center;font-size:0.875rem;margin-top:1.25rem;color:var(--gray-600);">
+        Already have an account? <a href="/login/" style="color:var(--gold);font-weight:600;">Sign in</a>
+      </p>
+      <p style="text-align:center;font-size:0.875rem;margin-top:0.5rem;color:var(--gray-600);">
+        Want to sell? <a href="/register/vendor/" style="color:var(--gold);font-weight:600;">Register as vendor</a>
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Manage Orders{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/admin-panel/">Admin</a><span class="breadcrumb-sep">›</span><span>Orders</span>
+    </div>
+    <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:2rem;">📦 All Orders</h1>
+    <table class="data-table">
+      <thead>
+        <tr><th>Order #</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Update Status</th></tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td style="color:var(--gold);font-weight:700;">{{ order.order_number }}</td>
+          <td>{{ order.customer.get_full_name|default:order.customer.username }}</td>
+          <td>PKR {{ order.total_amount }}</td>
+          <td><span class="status-badge status-{{ order.status }}">{{ order.status }}</span></td>
+          <td>{{ order.created_at|date:"M d, Y" }}</td>
+          <td>
+            <form method="POST" action="/admin-panel/orders/{{ order.id }}/status/" style="display:flex;gap:0.5rem;">
+              {% csrf_token %}
+              <select name="status" class="form-control" style="padding:0.35rem 0.6rem;font-size:0.8rem;">
+                {% for val, label in order.STATUS_CHOICES %}
+                  <option value="{{ val }}" {% if order.status == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm">Update</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

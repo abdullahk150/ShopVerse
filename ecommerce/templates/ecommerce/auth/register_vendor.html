@@ -1,0 +1,88 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Become a Vendor{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="form-card" style="max-width:560px;">
+      <h2 class="form-title">Start Selling</h2>
+      <p class="form-subtitle">Register your store on ShopVerse — pending admin approval</p>
+
+      {% if form.errors %}
+      <div style="background:#fee2e2;color:#991b1b;padding:0.85rem 1rem;border-radius:var(--radius);margin-bottom:1.25rem;font-size:0.875rem;">
+        <strong>Please fix the following errors:</strong>
+        <ul style="margin:0.5rem 0 0 1rem;padding:0;">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'register_vendor' %}">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" name="first_name" class="form-control" value="{{ form.first_name.value|default:'' }}" required>
+            {% if form.first_name.errors %}<small style="color:var(--red);">{{ form.first_name.errors.0 }}</small>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" class="form-control" value="{{ form.last_name.value|default:'' }}" required>
+            {% if form.last_name.errors %}<small style="color:var(--red);">{{ form.last_name.errors.0 }}</small>{% endif %}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Store Name</label>
+          <input type="text" name="store_name" class="form-control" placeholder="Your Business Name" value="{{ form.store_name.value|default:'' }}" required>
+          {% if form.store_name.errors %}<small style="color:var(--red);">{{ form.store_name.errors.0 }}</small>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Store Description</label>
+          <textarea name="description" class="form-control" rows="3" placeholder="What do you sell?">{{ form.description.value|default:'' }}</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" value="{{ form.username.value|default:'' }}" required>
+          {% if form.username.errors %}<small style="color:var(--red);">{{ form.username.errors.0 }}</small>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" value="{{ form.email.value|default:'' }}" required>
+          {% if form.email.errors %}<small style="color:var(--red);">{{ form.email.errors.0 }}</small>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="text" name="phone" class="form-control" value="{{ form.phone.value|default:'' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" name="password1" class="form-control" required>
+          {% if form.password1.errors %}<small style="color:var(--red);">{{ form.password1.errors.0 }}</small>{% endif %}
+          <small style="color:var(--gray-500);font-size:0.78rem;margin-top:0.3rem;display:block;">
+            Min 8 characters. Cannot be too similar to your username or entirely numeric.
+          </small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" name="password2" class="form-control" required>
+          {% if form.password2.errors %}<small style="color:var(--red);">{{ form.password2.errors.0 }}</small>{% endif %}
+        </div>
+
+        <div style="background:#fef3c7;border-radius:var(--radius);padding:0.85rem 1rem;margin-bottom:1.25rem;font-size:0.85rem;color:#92400e;">
+          ⚠️ Your vendor account will be reviewed and approved by an admin before you can list products.
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg">Register Store →</button>
+      </form>
+      <p style="text-align:center;font-size:0.875rem;margin-top:1.25rem;color:var(--gray-600);">
+        Already have an account? <a href="/login/" style="color:var(--gold);font-weight:600;">Sign in</a>
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

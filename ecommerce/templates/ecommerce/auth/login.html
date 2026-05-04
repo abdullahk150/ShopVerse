@@ -1,0 +1,32 @@
+{% extends 'ecommerce/base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="form-card">
+      <h2 class="form-title">Welcome Back</h2>
+      <p class="form-subtitle">Sign in to your ShopVerse account</p>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg">Sign In →</button>
+      </form>
+
+      <div class="form-divider">or</div>
+
+      <div style="display:flex;gap:1rem;">
+        <a href="/register/" class="btn btn-outline btn-full">Customer Signup</a>
+        <a href="/register/vendor/" class="btn btn-dark btn-full">Vendor Signup</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
