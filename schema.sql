@@ -32,8 +32,7 @@ CREATE TABLE user_profile (
                     CHECK (role IN ('customer', 'vendor', 'admin')),
     phone       VARCHAR(20)  DEFAULT '',
     avatar      VARCHAR(255) DEFAULT NULL,
-    created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    
 );
 
 COMMENT ON TABLE  user_profile        IS 'Extends Django auth_user with role and contact info.';
