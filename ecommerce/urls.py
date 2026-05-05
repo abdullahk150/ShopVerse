@@ -9,7 +9,10 @@ urlpatterns = [
     path('', views.home, name='home'),
 
     # ── Auth ──────────────────────────────────────────
-  
+    path('register/',         views.register_customer, name='register'),
+    path('register/vendor/',  views.register_vendor,   name='register_vendor'),
+    path('login/',            views.login_view,         name='login'),
+    path('logout/',           views.logout_view,        name='logout'),
 
     # ── Products ──────────────────────────────────────
     path('products/',                  views.product_list,   name='product_list'),
