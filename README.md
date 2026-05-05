@@ -18,15 +18,7 @@
 ## Project Structure
 
 ```
-ecommerce_project/
-├── manage.py
-├── requirements.txt
-├── schema.sql                         ← Raw PostgreSQL schema (for submission)
-├── ecommerce_platform/
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-└── ecommerce/
+
     ├── models.py                      ← All DB models (13 tables)
     ├── views.py                       ← All views / business logic
     ├── urls.py                        ← URL routing
