@@ -99,7 +99,8 @@ class Address(models.Model):
     city         = models.CharField(max_length=100)
     state        = models.CharField(max_length=100)
     postal_code  = models.CharField(max_length=20)
- 
+    country      = models.CharField(max_length=100, default='Pakistan')
+    is_default   = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'address'
