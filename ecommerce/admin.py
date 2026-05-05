@@ -60,4 +60,5 @@ class PaymentAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-  
+    list_display = ['product', 'customer', 'rating', 'is_verified', 'created_at']
+    list_filter  = ['rating', 'is_verified']
