@@ -119,3 +119,9 @@ print("\n📋 Login Credentials:")
 print("   Admin:    username=admin     | password=Admin@1234     | URL: /admin-panel/")
 print("   Vendor:   username=vendor1   | password=Vendor@1234    | URL: /vendor/")
 print("   Customer: username=customer1 | password=Customer@1234  | URL: /dashboard/")
+
+
+
+#dadwadawdadwawd
+#dawdawdwadaddawd#dawd
+#dhawdwaawdws
