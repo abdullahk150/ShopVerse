@@ -93,16 +93,6 @@ def register_customer(request):
     return render(request, 'ecommerce/auth/register_customer.html', {'form': form})
 
 
-def register_vendor(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    form = VendorRegistrationForm(request.POST or None)
-    if form.is_valid():
-        user = form.save()
-        login(request, user)
-        messages.info(request, "Your vendor account is pending admin approval.")
-        return redirect('home')
-    return render(request, 'ecommerce/auth/register_vendor.html', {'form': form})
 
 
 def login_view(request):
