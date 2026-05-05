@@ -9,10 +9,7 @@
     <h1 style="font-family:var(--font-display);font-size:2rem;margin-bottom:2rem;">📦 All Orders</h1>
     <table class="data-table">
       <thead>
-        <tr><th>Order #</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Update Status</th></tr>
-      </thead>
-      <tbody>
-        {% for order in orders %}
+       
         <tr>
           <td style="color:var(--gold);font-weight:700;">{{ order.order_number }}</td>
           <td>{{ order.customer.get_full_name|default:order.customer.username }}</td>
