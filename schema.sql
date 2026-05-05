@@ -79,7 +79,14 @@ CREATE INDEX idx_address_user ON address(user_id);
 -- 4. CATEGORY  (self-referential for sub-categories)
 -- ─────────────────────────────────────────────────
 CREATE TABLE category (
-   
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL UNIQUE,
+    slug        VARCHAR(110) NOT NULL UNIQUE,
+    description TEXT         DEFAULT '',
+    image       VARCHAR(255) DEFAULT NULL,
+    parent_id   INTEGER      DEFAULT NULL REFERENCES category(id) ON DELETE SET NULL,
+    is_active   BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_category_parent ON category(parent_id);
