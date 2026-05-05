@@ -15,7 +15,7 @@
 
 ---
 
-## Project Structure
+
 
 ```
 ecommerce_project/
