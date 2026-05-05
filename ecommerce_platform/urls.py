@@ -14,3 +14,6 @@ urlpatterns = [
 admin.site.site_header = "ShopVerse Admin Panel"
 admin.site.site_title = "ShopVerse"
 admin.site.index_title = "E-Commerce Administration"
+
+
+#URLS Configured successfully
