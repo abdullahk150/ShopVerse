@@ -60,11 +60,7 @@ class VendorProfile(models.Model):
     Extra vendor-specific data (1:1 with UserProfile for vendors).
     Supports admin approval workflow.
     """
-    STATUS_CHOICES = [
-        ('pending',  'Pending Approval'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-        ('suspended','Suspended'),
+   
     ]
 
     user_profile    = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='vendor_profile')
