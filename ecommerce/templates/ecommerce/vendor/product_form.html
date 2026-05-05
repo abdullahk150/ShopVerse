@@ -54,7 +54,11 @@
             <label class="form-label">Weight (kg)</label>
             <input type="number" name="weight_kg" class="form-control" step="0.01" min="0" value="{{ form.weight_kg.value|default:'0' }}">
           </div>
-          
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-control">
+              <option value="active"   {% if form.status.value == 'active'   %}selected{% endif %}>Active</option>
+              <option value="inactive" {% if form.status.value == 'inactive' %}selected{% endif %}>Inactive</option>
             </select>
           </div>
         </div>
